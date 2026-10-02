@@ -1,5 +1,13 @@
+
 # Velora
 
 A beauty and fashion shopping website built with HTML, CSS and JavaScript.
 
-Features: 200 products in categories, product details pages, search, cart, and a sign up page.
+🔗 **Live website:**https://app.netlify.com/projects/velora-beauty-fashion/overview
+
+## Features
+- 400 products across 20 categories (20 in each)
+- Product detail pages
+- Search and category filters
+- Shopping cart
+- Sign up and login page

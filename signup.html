@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign up | Velora</title>
+
+  <!-- Google Analytics code will go here later -->
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="nav"></nav>
+
+  <div class="section">
+    <h2>Welcome to Velora</h2>
+    <p class="sub">Create an account to save your cart and get 10% off your first order.</p>
+    <div class="tabs"><button id="tabUp" class="on">Sign up</button><button id="tabIn">Log in</button></div>
+
+    <form class="form" id="upForm">
+      <input type="text" id="upName" placeholder="Full name" required>
+      <input type="email" id="upEmail" placeholder="Email address" required>
+      <input type="password" id="upPass" placeholder="Password (at least 6 characters)" required>
+      <input type="password" id="upPass2" placeholder="Confirm password" required>
+      <label class="showpw"><input type="checkbox" id="showUp"> Show password</label>
+      <button class="btn" type="submit">Create account</button>
+    </form>
+
+    <form class="form" id="inForm" style="display:none">
+      <input type="email" id="inEmail" placeholder="Email address" required>
+      <input type="password" id="inPass" placeholder="Password" required>
+      <label class="showpw"><input type="checkbox" id="showIn"> Show password</label>
+      <button class="btn" type="submit">Log in</button>
+    </form>
+
+    <p class="msg" id="msg"></p>
+    <p class="note">Demo only: accounts are saved in your own browser and no password is stored. Please do not use a real password. We can connect a real database for login later.</p>
+  </div>
+
+  <footer>&copy; 2026 Velora. All rights reserved.</footer>
+
+  <script src="products.js"></script>
+  <script src="shop.js"></script>
+  <script>
+    function bindShow(boxId, fieldIds) {
+      $(boxId).onchange = function () {
+        const type = this.checked ? "text" : "password";
+        fieldIds.forEach(function (f) { $(f).type = type; });
+      };
+    }
+    bindShow("showUp", ["upPass", "upPass2"]);
+    bindShow("showIn", ["inPass"]);
+    function show(text, ok) { $("msg").textContent = text; $("msg").className = "msg " + (ok ? "ok" : "err"); }
+    function tab(up) {
+      $("upForm").style.display = up ? "block" : "none"; $("inForm").style.display = up ? "none" : "block";
+      $("tabUp").className = up ? "on" : ""; $("tabIn").className = up ? "" : "on"; show("", true);
+    }
+    $("tabUp").onclick = function () { tab(true); };
+    $("tabIn").onclick = function () { tab(false); };
+    $("upForm").onsubmit = function (e) {
+      e.preventDefault();
+      const name = $("upName").value.trim(), email = $("upEmail").value.trim().toLowerCase();
+      if ($("upPass").value.length < 6) return show("Password must be at least 6 characters.", false);
+      if ($("upPass").value !== $("upPass2").value) return show("The two passwords do not match.", false);
+      const users = load("velora_users") || [];
+      if (users.some(function (u) { return u.email === email; })) return show("This email already has an account. Please log in.", false);
+      users.push({ name: name, email: email }); save("velora_users", users);
+      save("velora_user", { name: name, email: email });
+      show("Account created! Taking you to the home page...", true);
+      setTimeout(function () { location.href = "index.html"; }, 1200);
+    };
+    $("inForm").onsubmit = function (e) {
+      e.preventDefault();
+      const email = $("inEmail").value.trim().toLowerCase();
+      const u = (load("velora_users") || []).find(function (x) { return x.email === email; });
+      if (!u) return show("No account found for this email. Please sign up first.", false);
+      save("velora_user", u);
+      show("Logged in! Taking you to the home page...", true);
+      setTimeout(function () { location.href = "index.html"; }, 1000);
+    };
+  </script>
+</body>
+</html>

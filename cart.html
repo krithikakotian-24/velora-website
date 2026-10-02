@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cart | Velora</title>
+
+  <!-- Google Analytics code will go here later -->
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="nav"></nav>
+
+  <div class="section">
+    <h2>Your cart</h2>
+    <div id="cart"></div>
+  </div>
+
+  <footer>&copy; 2026 Velora. All rights reserved.</footer>
+
+  <script src="products.js"></script>
+  <script src="shop.js"></script>
+  <script>
+    function drawCart() {
+      const cart = load("velora_cart") || [];
+      const box = $("cart");
+      if (!cart.length) { box.innerHTML = '<p class="sub">Your cart is empty.</p><a class="btn" href="index.html">Start shopping</a>'; renderNav(); return; }
+      let total = 0;
+      box.innerHTML = cart.map(function (it, idx) {
+        const p = findProduct(it.id); total += p.price * it.qty;
+        return '<div class="cart-row"><img src="' + productImage(p) + '" data-id="' + p.id + '" onerror="fb(this)" alt=""><div class="info"><b>' + esc(p.name) + '</b><br>' +
+          (it.opt ? '<small>' + p.opts.label + ': ' + esc(it.opt) + '</small><br>' : '') + '<span class="price">' + money(p.price) + '</span></div>' +
+          '<div class="qty"><button onclick="chg(' + idx + ',-1)">-</button><span>' + it.qty + '</span><button onclick="chg(' + idx + ',1)">+</button>' +
+          '<button class="linkbtn" onclick="del(' + idx + ')">Remove</button></div></div>';
+      }).join("") + '<div class="total">Total: <b>' + money(total) + '</b></div><div style="text-align:right"><button class="btn" id="checkout">Checkout</button></div><p class="msg" id="cmsg"></p>';
+      $("checkout").onclick = function () {
+        if (!load("velora_user")) { location.href = "signup.html"; return; }
+        $("cmsg").className = "msg ok"; $("cmsg").textContent = "This is a demo shop, so no payment is taken. Real payments need a backend, which we can add later.";
+      };
+      renderNav();
+    }
+    function chg(i, d) { const c = load("velora_cart"); c[i].qty += d; if (c[i].qty < 1) c.splice(i, 1); save("velora_cart", c); drawCart(); }
+    function del(i) { const c = load("velora_cart"); c.splice(i, 1); save("velora_cart", c); drawCart(); }
+    drawCart();
+  </script>
+</body>
+</html>

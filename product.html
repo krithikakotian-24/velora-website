@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product | Velora</title>
+
+  <!-- Google Analytics code will go here later -->
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="nav"></nav>
+
+  <div class="section">
+    <div class="detail" id="detail"></div>
+  </div>
+  <div class="section" style="padding-top:0">
+    <h2>You may also like</h2>
+    <div class="grid" id="similar" style="margin-top:20px"></div>
+  </div>
+
+  <footer>&copy; 2026 Velora. All rights reserved.</footer>
+
+  <script src="products.js"></script>
+  <script src="shop.js"></script>
+  <script>
+    const p = findProduct(new URLSearchParams(location.search).get("id"));
+    const box = $("detail");
+    if (!p) {
+      box.innerHTML = '<p>Product not found. <a href="index.html"><u>Go to home</u></a></p>';
+    } else {
+      document.title = p.name + " | Velora";
+      const info = catInfo[p.cat];
+      const off = Math.round((1 - p.price / p.mrp) * 100);
+      const opts = p.opts ? '<div class="opts"><b>' + p.opts.label + ':</b><br>' + p.opts.values.map(function (v, i) {
+        return '<label class="opt"><input type="radio" name="opt" value="' + v + '"' + (i === 0 ? " checked" : "") + '><span>' + v + '</span></label>';
+      }).join("") + '</div>' : "";
+      box.innerHTML = '<div class="d-img"><img src="' + productImage(p) + '" data-id="' + p.id + '" onerror="fb(this)" alt="' + esc(p.name) + '"></div>' +
+        '<div class="d-info">' +
+        '<p class="crumb"><a href="' + p.section + '.html">' + cap(p.section) + '</a> / <a href="' + p.section + '.html#' + slug(p.cat) + '">' + p.cat + '</a></p>' +
+        '<h1>' + esc(p.name) + '</h1>' +
+        '<div class="rate">\u2605 ' + p.rating + ' <span>(' + p.reviews.toLocaleString("en-IN") + ' ratings)</span></div>' +
+        '<div class="pricebox"><span class="big">' + money(p.price) + '</span> <s>' + money(p.mrp) + '</s> <span class="off">' + off + '% off</span></div>' +
+        '<p class="tax">Inclusive of all taxes.</p>' + opts +
+        '<div><button class="btn" id="add">Add to cart</button><button class="btn outline" id="buy">Buy now</button></div>' +
+        '<h3>About this product</h3><p>' + esc(p.name) + '. ' + info.desc + '</p>' +
+        '<ul>' + info.points.map(function (x) { return "<li>" + x + "</li>"; }).join("") + '</ul>' +
+        '<h3>Details</h3><table class="specs">' +
+        '<tr><td>Brand</td><td>Velora</td></tr><tr><td>Category</td><td>' + p.cat + '</td></tr>' +
+        '<tr><td>Product ID</td><td>' + p.id.toUpperCase() + '</td></tr><tr><td>Rating</td><td>' + p.rating + ' out of 5</td></tr></table>' +
+        '</div>';
+      function chosen() { const r = document.querySelector('input[name="opt"]:checked'); return r ? r.value : ""; }
+      $("add").onclick = function () { addToCart(p.id, chosen()); this.textContent = "Added \u2713"; };
+      $("buy").onclick = function () { addToCart(p.id, chosen()); location.href = "cart.html"; };
+      $("similar").innerHTML = allProducts.filter(function (x) { return x.cat === p.cat && x.id !== p.id; }).slice(0, 4).map(card).join("");
+    }
+  </script>
+</body>
+</html>
